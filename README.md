@@ -33,7 +33,6 @@ This server is designed to be easy to set up using the `uv` Python package manag
 Once configured in your client, the MCP server will be automatically started by the client (`uv run ...`) when needed. The client will communicate with it using STDIO.
 
 The server exposes a tool named `create_python_function` that accepts the following required arguments:
-# ... (rest of tool description remains the same) ...
 
 ## Development
 
