@@ -55,8 +55,16 @@ async def main():
 
                 # Define the function requirements
                 function_details = {
-                    "requirement": "Takes an integer 'count' and a string 'text'. Checks if the integer 'count' is greater than the length of the string 'text'. Returns a boolean.",
-                }
+  "requirement": "Problem: Check if a number is prime...",
+  "test_cases": [
+    {"inputs": {"number": 2}, "expected": True},
+    {"inputs": {"number": 7}, "expected": True},
+    {"inputs": {"number": 10}, "expected": False},
+    {"inputs": {"number": 1}, "expected": False},
+    {"inputs": {"number": 15}, "expected": False},
+    {"inputs": {"number": 97}, "expected": True}
+  ]
+}
 
                 print(f"\nCalling tool 'create_python_function' with args:\n{json.dumps(function_details, indent=2)}")
 

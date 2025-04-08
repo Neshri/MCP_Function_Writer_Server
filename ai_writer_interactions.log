@@ -1,266 +1,516 @@
-2025-04-08 15:49:11 - AIProgramWriter - INFO - AIProgramWriter initialized with settings: {'debug_logging': True, 'spec_model': 'deepseek-coder:6.7b', 'code_model': 'deepseek-coder:6.7b', 'test_model': 'deepseek-coder:6.7b', 'spec_retries': 3, 'code_retries': 3, 'test_retries': 3, 'spec_temperature': 0.0, 'code_temperature': 0.1, 'test_temperature': 0.1, 'default_seed': 42}
-2025-04-08 15:49:11 - AIProgramWriter - INFO - Received request for tool 'create_python_function' with requirement: Takes an integer 'count' and a string 'text'. Checks if the integer 'count' is greater than the leng...
-2025-04-08 15:49:11 - AIProgramWriter - INFO - Starting generation for requirement: 'Takes an integer 'count' and a string 'text'. Checks if the integer 'count' is greater than the leng...'
-2025-04-08 15:49:11 - AIProgramWriter - INFO - Attempting to generate function specification...
-2025-04-08 15:49:11 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.0, 'seed': 42, 'top_k': 1}
---- Prompt ---
-SYSTEM: You are a precise code specification generator. Respond ONLY with valid JSON fitting the template. No explanations, apologies, or introductory text. Ensure types are valid Python type hints. The docstring should concisely describe the function's core purpose.
-REQUIREMENT:
-Takes an integer 'count' and a string 'text'. Checks if the integer 'count' is greater than the length of the string 'text'. Returns a boolean.
-
-JSON TEMPLATE:
-{
-    "name": "function_name",
-    "parameters": { // Mapping of parameter name to Python type hint string (e.g., "s": "str", "nums": "list[int]")
-        "param_name_1": "type_hint_1",
-        "param_name_2": "type_hint_2"
-    },
-    "docstring": "Concise description (under 20 words) of what the function does.",
-    "returns": "Python type hint string for the return value (e.g., 'str', 'bool', 'Optional[int]')"
-}
-
-RULES:
-1. Output *only* the JSON object.
-2. Parameter and return types must be valid Python type hints (e.g., `str`, `int`, `list[int]`, `dict[str, float]`, `Optional[bool]`).
-3. The docstring must accurately and concisely reflect the requirement.
-4. Do not use markdown fences like ```json.
-
-VALID JSON RESPONSE:
--------------
-2025-04-08 15:49:28 - AIProgramWriter - DEBUG - Ollama Raw Response:
-{
-    "name": "check_count",
-    "parameters": {
-        "count": "int",
-        "text": "str"
-    },
-    "docstring": "Checks if count is greater than length of text.",
-    "returns": "bool"
-}
-
-2025-04-08 15:49:28 - AIProgramWriter - DEBUG - Attempting JSON extraction...
-2025-04-08 15:49:28 - AIProgramWriter - DEBUG - Attempting direct JSON parsing.
-2025-04-08 15:49:28 - AIProgramWriter - INFO - Specification generated: FunctionSpec(name='check_count', parameters={'count': 'int', 'text': 'str'}, docstring='Checks if count is greater than length of text.', returns='bool')
-2025-04-08 15:49:28 - AIProgramWriter - INFO - Attempting to generate test cases...
-2025-04-08 15:49:28 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.1, 'seed': 42}
---- Prompt ---
-SYSTEM: You are a test case generator. Create a diverse set of relevant test cases (including edge cases) for the given Python function specification. Respond ONLY with a valid JSON object containing a list under the "tests" key, following the exact format provided. Do not include explanations, apologies, or text outside the JSON structure.
-
-FUNCTION SPECIFICATION:
-Name: check_count
-Parameters: {'count': 'int', 'text': 'str'}
-Return Type: bool
-Description: Checks if count is greater than length of text.
-
-JSON TEMPLATE:
-{
-    "tests": [
-        { "inputs": { "param_name_1": <value_1>, "param_name_2": <value_2> }, "expected": <expected_return_value> },
-        // ... more test cases ...
-    ]
-}
-
-RULES:
-1. Provide at least 3 diverse test cases (normal, edge, potentially invalid if relevant to error handling).
-2. Ensure input values match the expected types in the parameters (e.g., if "nums": "list[int]", provide `[1, 2, 3]`, not `"1, 2, 3"`).
-3. Ensure the "expected" value matches the specified return type.
-4. Output *only* the JSON object. Do not use markdown fences.
-
-VALID JSON RESPONSE:
--------------
-2025-04-08 15:49:38 - AIProgramWriter - DEBUG - Ollama Raw Response:
-{
-    "tests": [
-        { "inputs": {"count": 10, "text": "hello"}, "expected": true},
-        { "inputs": {"count": 3, "text": "hi"}, "expected": false},
-        { "inputs": {"count": -5, "text": ""}, "expected": false}
-    ]
-}
-
-2025-04-08 15:49:38 - AIProgramWriter - DEBUG - Attempting JSON extraction...
-2025-04-08 15:49:38 - AIProgramWriter - DEBUG - Attempting direct JSON parsing.
-2025-04-08 15:49:38 - AIProgramWriter - INFO - Successfully parsed 3 test cases.
-2025-04-08 15:49:38 - AIProgramWriter - INFO - Generated 3 test cases.
-2025-04-08 15:49:38 - AIProgramWriter - INFO - Starting code generation and testing loop...
-2025-04-08 15:49:38 - AIProgramWriter - INFO - Attempting code generation (Attempt 1/3)...
-2025-04-08 15:49:38 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.1, 'seed': 42}
---- Prompt ---
-SYSTEM: You are a Python code generation assistant. Create a Python function based *only* on the provided specification. Include necessary imports if standard libraries are needed (like `math`, `re`, `typing`). Handle potential edge cases and errors gracefully where appropriate (e.g., empty inputs, type mismatches if feasible within the function). Respond ONLY with the complete Python code for the function definition, including imports if needed. Do NOT include example usage, explanations outside comments, or markdown fences.
-
-SPECIFICATION:
-Function Name: check_count
-Parameters: {'count': 'int', 'text': 'str'}
-Return Type: bool
-Description: Checks if count is greater than length of text.
-
-PYTHON CODE ONLY:
--------------
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Ollama Raw Response:
-```python
-def check_count(count: int, text: str) -> bool:
-    return count > len(text)
-```
-
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Attempting Python code extraction...
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Extracted code from ```python block.
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Code generation attempt 1 result:
-def check_count(count: int, text: str) -> bool:
-    return count > len(text)
-2025-04-08 15:49:42 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec().
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Validating syntax for code:
----
-def check_count(count: int, text: str) -> bool:
-    return count > len(text)
----
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error).
-2025-04-08 15:49:42 - AIProgramWriter - INFO - Code syntax and function 'check_count' presence validated.
-2025-04-08 15:49:42 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec().
-2025-04-08 15:49:42 - AIProgramWriter - INFO - Running 3 tests against generated code...
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Running test 1: Input={'count': 10, 'text': 'hello'}, Expected=True
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Test 1 passed.
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Running test 2: Input={'count': 3, 'text': 'hi'}, Expected=False
-2025-04-08 15:49:42 - AIProgramWriter - WARNING - Test 2 failed: Expected=False, Actual=True
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Running test 3: Input={'count': -5, 'text': ''}, Expected=False
-2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Test 3 passed.
-2025-04-08 15:49:42 - AIProgramWriter - INFO - Tests completed: 2 passed, 1 failed, 0 errors.
-2025-04-08 15:49:42 - AIProgramWriter - WARNING - Attempt 1 failed tests. Feedback for next attempt: Code executed but failed 1 test(s):
-- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
-2025-04-08 15:49:42 - AIProgramWriter - WARNING - Retrying code generation (Attempt 2/3) with feedback.
-2025-04-08 15:49:44 - AIProgramWriter - INFO - Attempting code generation (Attempt 2/3)...
-2025-04-08 15:49:44 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.1, 'seed': 43}
---- Prompt ---
-SYSTEM: You are a Python code generation assistant. Create a Python function based *only* on the provided specification. Include necessary imports if standard libraries are needed (like `math`, `re`, `typing`). Handle potential edge cases and errors gracefully where appropriate (e.g., empty inputs, type mismatches if feasible within the function). Respond ONLY with the complete Python code for the function definition, including imports if needed. Do NOT include example usage, explanations outside comments, or markdown fences.
-
-SPECIFICATION:
-Function Name: check_count
-Parameters: {'count': 'int', 'text': 'str'}
-Return Type: bool
-Description: Checks if count is greater than length of text.
-
-PREVIOUS ERROR (Attempt 2):
-Code executed but failed 1 test(s):
-- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
-
-PYTHON CODE ONLY:
--------------
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Ollama Raw Response:
-```python
-def check_count(count: int, text: str) -> bool:
-    if not isinstance(count, int):
-        raise TypeError("Count must be an integer")
-    elif not isinstance(text, str):
-        raise TypeError("Text must be a string")
+2025-04-08 17:29:04 - AIProgramWriter - INFO - AIProgramWriter initialized with settings: {'debug_logging': True, 'spec_model': 'deepseek-coder:6.7b', 'code_model': 'deepseek-coder:6.7b', 'spec_retries': 3, 'code_retries': 3, 'code_syntax_retries': 1, 'spec_temperature': 0.0, 'code_temperature': 0.1, 'default_seed': 42}
+2025-04-08 17:29:04 - AIProgramWriter - INFO - Received request for tool 'create_python_function'. Tests provided: True
+2025-04-08 17:29:04 - AIProgramWriter - INFO - Starting generation for requirement: 'Problem: Check if a number is prime......'. Human tests provided: True
+2025-04-08 17:29:04 - AIProgramWriter - INFO - Processing 6 human-provided test cases to extract input keys...
+2025-04-08 17:29:04 - AIProgramWriter - INFO - Using input keys from tests for spec generation: {'number'}
+2025-04-08 17:29:04 - AIProgramWriter - INFO - Attempting to generate function specification. Key constraint: {'number'}
+2025-04-08 17:29:04 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 17:29:04 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 17:29:04 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 17:29:24 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=150
+2025-04-08 17:29:24 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=149
+2025-04-08 17:29:24 - AIProgramWriter - DEBUG - Attempting JSON extraction...
+2025-04-08 17:29:24 - AIProgramWriter - DEBUG - Attempting direct JSON parsing.
+2025-04-08 17:29:24 - AIProgramWriter - INFO - Specification generated: FunctionSpec(name='is_prime', parameters={'number': 'int'}, docstring='Checks if a number is prime.', returns='bool')
+2025-04-08 17:29:24 - AIProgramWriter - INFO - Spec parameter keys successfully validated against test input keys.
+2025-04-08 17:29:24 - AIProgramWriter - INFO - Successfully structured 6 test cases.
+2025-04-08 17:29:24 - AIProgramWriter - INFO - Starting code generation. Testing enabled: True. Max attempts: 3
+2025-04-08 17:29:24 - AIProgramWriter - INFO - Attempting code generation (Attempt 1)...
+2025-04-08 17:29:24 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 17:29:24 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 17:29:24 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=628
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=627
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Code generation attempt 1 raw code:
+def is_prime(number):
+    # Checking for edge cases
+    if not isinstance(number, int) or number < 2:
+        return False
     
-    return count > len(text)
-```
-
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Attempting Python code extraction...
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Extracted code from ```python block.
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Code generation attempt 2 result:
-def check_count(count: int, text: str) -> bool:
-    if not isinstance(count, int):
-        raise TypeError("Count must be an integer")
-    elif not isinstance(text, str):
-        raise TypeError("Text must be a string")
+    # 0 and 1 are not prime numbers
+    if number in (0, 1):
+        return False
+        
+    # 2 and 3 are prime numbers
+    if number in (2, 3):
+        return True
     
-    return count > len(text)
-2025-04-08 15:49:49 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec().
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Validating syntax for code:
+    # Checking for divisibility by 2 or 3
+    if number % 2 == 0 or number % 3 == 0:
+        return False
+        
+    i = 5
+    while i * i <= number:
+        if number % i == 0 or number % (i + 2) == 0:
+            return False
+        i += 6
+    
+    # If no factors found, the number is prime
+    return True
+2025-04-08 17:29:47 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec() in a thread.
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Validating syntax for code:
 ---
-def check_count(count: int, text: str) -> bool:
-    if not isinstance(count, int):
-        raise TypeError("Count must be an integer")
-    elif not isinstance(text, str):
-        raise TypeError("Text must be a string")
+def is_prime(number):
+    # Checking for edge cases
+    if not isinstance(number, int) or number < 2:
+        return False
     
-    return count > len(text)
+    # 0 and 1 are not prime numbers
+    if number in (0, 1):
+        return False
+        
+    # 2 and 3 are prime numbers
+    if number in (2, 3):
+        return True
+    
+    # Checking for divisibility by 2 or 3
+    if number % 2 == 0 or number % 3 == 0:
+        return False
+        
+    i = 5
+    while i * i <= number:
+        if number % i == 0 or number % (i + 2) == 0:
+            return False
+        i += 6
+    
+    # If no factors found, the number is prime
+    return True
 ---
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error).
-2025-04-08 15:49:49 - AIProgramWriter - INFO - Code syntax and function 'check_count' presence validated.
-2025-04-08 15:49:49 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec().
-2025-04-08 15:49:49 - AIProgramWriter - INFO - Running 3 tests against generated code...
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Running test 1: Input={'count': 10, 'text': 'hello'}, Expected=True
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Test 1 passed.
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Running test 2: Input={'count': 3, 'text': 'hi'}, Expected=False
-2025-04-08 15:49:49 - AIProgramWriter - WARNING - Test 2 failed: Expected=False, Actual=True
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Running test 3: Input={'count': -5, 'text': ''}, Expected=False
-2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Test 3 passed.
-2025-04-08 15:49:49 - AIProgramWriter - INFO - Tests completed: 2 passed, 1 failed, 0 errors.
-2025-04-08 15:49:49 - AIProgramWriter - WARNING - Attempt 2 failed tests. Feedback for next attempt: Code executed but failed 1 test(s):
-- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
-2025-04-08 15:49:49 - AIProgramWriter - WARNING - Retrying code generation (Attempt 3/3) with feedback.
-2025-04-08 15:49:53 - AIProgramWriter - INFO - Attempting code generation (Attempt 3/3)...
-2025-04-08 15:49:53 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.1, 'seed': 44}
---- Prompt ---
-SYSTEM: You are a Python code generation assistant. Create a Python function based *only* on the provided specification. Include necessary imports if standard libraries are needed (like `math`, `re`, `typing`). Handle potential edge cases and errors gracefully where appropriate (e.g., empty inputs, type mismatches if feasible within the function). Respond ONLY with the complete Python code for the function definition, including imports if needed. Do NOT include example usage, explanations outside comments, or markdown fences.
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error in thread).
+2025-04-08 17:29:47 - AIProgramWriter - INFO - Code syntax and function 'is_prime' presence validated.
+2025-04-08 17:29:47 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec() in threads.
+2025-04-08 17:29:47 - AIProgramWriter - INFO - Running 6 provided tests against generated code...
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Running test 1: Input Dict={'number': 2}, Expected=True
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Test 1 passed.
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Running test 2: Input Dict={'number': 7}, Expected=True
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Test 2 passed.
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Running test 3: Input Dict={'number': 10}, Expected=False
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Test 3 passed.
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Running test 4: Input Dict={'number': 1}, Expected=False
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Test 4 passed.
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Running test 5: Input Dict={'number': 15}, Expected=False
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Test 5 passed.
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Running test 6: Input Dict={'number': 97}, Expected=True
+2025-04-08 17:29:47 - AIProgramWriter - DEBUG - Test 6 passed.
+2025-04-08 17:29:47 - AIProgramWriter - INFO - Tests completed: 6 passed, 0 failed, 0 errors.
+2025-04-08 17:29:47 - AIProgramWriter - INFO - Code passed all 6 provided tests on attempt 1.
+2025-04-08 17:29:47 - AIProgramWriter - INFO - Code generation successful.
+2025-04-08 17:29:47 - AIProgramWriter - INFO - Code passed provided human tests.
+2025-04-08 17:29:47 - AIProgramWriter - INFO - Generation process finished in 42968.25 ms. Success: True
+2025-04-08 17:29:47 - AIProgramWriter - INFO - AI writer succeeded.
+2025-04-08 17:57:03 - AIProgramWriter - INFO - AIProgramWriter initialized with settings: {'debug_logging': True, 'spec_model': 'deepseek-coder:6.7b', 'code_model': 'deepseek-coder:6.7b', 'spec_retries': 3, 'code_retries': 3, 'code_syntax_retries': 1, 'spec_temperature': 0.0, 'code_temperature': 0.1, 'default_seed': 42}
+2025-04-08 18:00:31 - AIProgramWriter - INFO - Received request for tool 'create_python_function'. Tests provided: True
+2025-04-08 18:00:31 - AIProgramWriter - INFO - Starting generation for requirement: 'Create a function called 'calculate_fibonacci' that takes an integer n as input and returns the nth ...'. Human tests provided: True
+2025-04-08 18:00:31 - AIProgramWriter - INFO - Processing 4 human-provided test cases to extract input keys...
+2025-04-08 18:00:31 - AIProgramWriter - INFO - Using input keys from tests for spec generation: {'n'}
+2025-04-08 18:00:31 - AIProgramWriter - INFO - Attempting to generate function specification. Key constraint: {'n'}
+2025-04-08 18:00:31 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:00:31 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:00:31 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:01:02 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=173
+2025-04-08 18:01:02 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=172
+2025-04-08 18:01:02 - AIProgramWriter - DEBUG - Attempting JSON extraction...
+2025-04-08 18:01:02 - AIProgramWriter - DEBUG - Attempting direct JSON parsing.
+2025-04-08 18:01:02 - AIProgramWriter - INFO - Specification generated: FunctionSpec(name='calculate_fibonacci', parameters={'n': 'int'}, docstring='Calculates the nth Fibonacci number.', returns='Optional[int]')
+2025-04-08 18:01:02 - AIProgramWriter - INFO - Spec parameter keys successfully validated against test input keys.
+2025-04-08 18:01:02 - AIProgramWriter - INFO - Successfully structured 4 test cases.
+2025-04-08 18:01:02 - AIProgramWriter - INFO - Starting code generation. Testing enabled: True. Max attempts: 3
+2025-04-08 18:01:02 - AIProgramWriter - INFO - Attempting code generation (Attempt 1)...
+2025-04-08 18:01:02 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:01:02 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:01:02 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=349
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=348
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Code generation attempt 1 raw code:
+from typing import Optional
 
-SPECIFICATION:
-Function Name: check_count
-Parameters: {'count': 'int', 'text': 'str'}
-Return Type: bool
-Description: Checks if count is greater than length of text.
-
-PREVIOUS ERROR (Attempt 3):
-Code executed but failed 1 test(s):
-- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
-
-PYTHON CODE ONLY:
--------------
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Ollama Raw Response:
-```python
-def check_count(count: int, text: str) -> bool:
-    if not isinstance(count, int):
-        raise TypeError("Count must be an integer.")
-    elif not isinstance(text, str):
-        raise TypeError("Text must be a string.")
+def calculate_fibonacci(n: int) -> Optional[int]:
+    if not isinstance(n, int):
+        raise TypeError("Input must be an integer")
+    elif n < 0:
+        return None  # Fibonacci sequence is undefined for negative numbers
     
-    return count > len(text)
-```
-
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Attempting Python code extraction...
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Extracted code from ```python block.
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Code generation attempt 3 result:
-def check_count(count: int, text: str) -> bool:
-    if not isinstance(count, int):
-        raise TypeError("Count must be an integer.")
-    elif not isinstance(text, str):
-        raise TypeError("Text must be a string.")
-    
-    return count > len(text)
-2025-04-08 15:49:59 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec().
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Validating syntax for code:
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+2025-04-08 18:01:26 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec() in a thread.
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Validating syntax for code:
 ---
-def check_count(count: int, text: str) -> bool:
-    if not isinstance(count, int):
-        raise TypeError("Count must be an integer.")
-    elif not isinstance(text, str):
-        raise TypeError("Text must be a string.")
+from typing import Optional
+
+def calculate_fibonacci(n: int) -> Optional[int]:
+    if not isinstance(n, int):
+        raise TypeError("Input must be an integer")
+    elif n < 0:
+        return None  # Fibonacci sequence is undefined for negative numbers
     
-    return count > len(text)
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
 ---
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error).
-2025-04-08 15:49:59 - AIProgramWriter - INFO - Code syntax and function 'check_count' presence validated.
-2025-04-08 15:49:59 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec().
-2025-04-08 15:49:59 - AIProgramWriter - INFO - Running 3 tests against generated code...
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Running test 1: Input={'count': 10, 'text': 'hello'}, Expected=True
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Test 1 passed.
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Running test 2: Input={'count': 3, 'text': 'hi'}, Expected=False
-2025-04-08 15:49:59 - AIProgramWriter - WARNING - Test 2 failed: Expected=False, Actual=True
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Running test 3: Input={'count': -5, 'text': ''}, Expected=False
-2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Test 3 passed.
-2025-04-08 15:49:59 - AIProgramWriter - INFO - Tests completed: 2 passed, 1 failed, 0 errors.
-2025-04-08 15:49:59 - AIProgramWriter - WARNING - Attempt 3 failed tests. Feedback for next attempt: Code executed but failed 1 test(s):
-- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
-2025-04-08 15:49:59 - AIProgramWriter - ERROR - Code generation failed to produce passing code after 3 attempts.
-2025-04-08 15:49:59 - AIProgramWriter - ERROR - Generation failed: Failed to generate code that passes all tests after multiple retries.
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error in thread).
+2025-04-08 18:01:26 - AIProgramWriter - INFO - Code syntax and function 'calculate_fibonacci' presence validated.
+2025-04-08 18:01:26 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec() in threads.
+2025-04-08 18:01:26 - AIProgramWriter - INFO - Running 4 provided tests against generated code...
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Running test 1: Input Dict={'n': 0}, Expected=0
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Test 1 passed.
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Running test 2: Input Dict={'n': 1}, Expected=1
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Test 2 passed.
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Running test 3: Input Dict={'n': 10}, Expected=55
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Test 3 passed.
+2025-04-08 18:01:26 - AIProgramWriter - DEBUG - Running test 4: Input Dict={'n': -1}, Expected=Invalid input
+2025-04-08 18:01:26 - AIProgramWriter - WARNING - Test 4 failed: Expected=Invalid input, Actual=None
+2025-04-08 18:01:26 - AIProgramWriter - INFO - Tests completed: 3 passed, 1 failed, 0 errors.
+2025-04-08 18:01:26 - AIProgramWriter - WARNING - Attempt 1 failed tests. Feedback for next attempt:
+Code executed but failed/errored on 1 test(s):
+- Input: {'n': -1}, Expected: Invalid input, Got: None
+2025-04-08 18:01:26 - AIProgramWriter - WARNING - Retrying code generation (Attempt 2/3) with test feedback.
+2025-04-08 18:01:28 - AIProgramWriter - INFO - Attempting code generation (Attempt 2)...
+2025-04-08 18:01:28 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:01:28 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:01:28 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=251
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=250
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Code generation attempt 2 raw code:
+def calculate_fibonacci(n: int) -> Optional[int]:
+    if n < 0:
+        return None
+    elif n == 0 or n == 1:
+        return n
+    else:
+        a, b = 0, 1
+        for _ in range(2, n + 1):
+            a, b = b, a + b
+        return b
+2025-04-08 18:01:52 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec() in a thread.
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Validating syntax for code:
+---
+def calculate_fibonacci(n: int) -> Optional[int]:
+    if n < 0:
+        return None
+    elif n == 0 or n == 1:
+        return n
+    else:
+        a, b = 0, 1
+        for _ in range(2, n + 1):
+            a, b = b, a + b
+        return b
+---
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error in thread).
+2025-04-08 18:01:52 - AIProgramWriter - INFO - Code syntax and function 'calculate_fibonacci' presence validated.
+2025-04-08 18:01:52 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec() in threads.
+2025-04-08 18:01:52 - AIProgramWriter - INFO - Running 4 provided tests against generated code...
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Running test 1: Input Dict={'n': 0}, Expected=0
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Test 1 passed.
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Running test 2: Input Dict={'n': 1}, Expected=1
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Test 2 passed.
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Running test 3: Input Dict={'n': 10}, Expected=55
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Test 3 passed.
+2025-04-08 18:01:52 - AIProgramWriter - DEBUG - Running test 4: Input Dict={'n': -1}, Expected=Invalid input
+2025-04-08 18:01:52 - AIProgramWriter - WARNING - Test 4 failed: Expected=Invalid input, Actual=None
+2025-04-08 18:01:52 - AIProgramWriter - INFO - Tests completed: 3 passed, 1 failed, 0 errors.
+2025-04-08 18:01:52 - AIProgramWriter - WARNING - Attempt 2 failed tests. Feedback for next attempt:
+Code executed but failed/errored on 1 test(s):
+- Input: {'n': -1}, Expected: Invalid input, Got: None
+2025-04-08 18:01:52 - AIProgramWriter - WARNING - Retrying code generation (Attempt 3/3) with test feedback.
+2025-04-08 18:01:56 - AIProgramWriter - INFO - Attempting code generation (Attempt 3)...
+2025-04-08 18:01:56 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:01:56 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:01:56 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=395
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=394
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Code generation attempt 3 raw code:
+from typing import Optional
+import math
+
+def calculate_fibonacci(n: int) -> Optional[int]:
+    if n < 0 or not isinstance(n, int):
+        return None
+    
+    sqrt_5 = math.sqrt(5)
+    phi = (1 + sqrt_5) / 2
+    psi = (1 - sqrt_5) / 2
+    
+    # Using Binet's formula to calculate the nth Fibonacci number
+    fib_n = int((phi**n - psi**n) / sqrt_5 + 0.5)  
+    
+    return fib_n
+2025-04-08 18:02:29 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec() in a thread.
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Validating syntax for code:
+---
+from typing import Optional
+import math
+
+def calculate_fibonacci(n: int) -> Optional[int]:
+    if n < 0 or not isinstance(n, int):
+        return None
+    
+    sqrt_5 = math.sqrt(5)
+    phi = (1 + sqrt_5) / 2
+    psi = (1 - sqrt_5) / 2
+    
+    # Using Binet's formula to calculate the nth Fibonacci number
+    fib_n = int((phi**n - psi**n) / sqrt_5 + 0.5)  
+    
+    return fib_n
+---
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error in thread).
+2025-04-08 18:02:29 - AIProgramWriter - INFO - Code syntax and function 'calculate_fibonacci' presence validated.
+2025-04-08 18:02:29 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec() in threads.
+2025-04-08 18:02:29 - AIProgramWriter - INFO - Running 4 provided tests against generated code...
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Running test 1: Input Dict={'n': 0}, Expected=0
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Test 1 passed.
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Running test 2: Input Dict={'n': 1}, Expected=1
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Test 2 passed.
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Running test 3: Input Dict={'n': 10}, Expected=55
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Test 3 passed.
+2025-04-08 18:02:29 - AIProgramWriter - DEBUG - Running test 4: Input Dict={'n': -1}, Expected=Invalid input
+2025-04-08 18:02:29 - AIProgramWriter - WARNING - Test 4 failed: Expected=Invalid input, Actual=None
+2025-04-08 18:02:29 - AIProgramWriter - INFO - Tests completed: 3 passed, 1 failed, 0 errors.
+2025-04-08 18:02:29 - AIProgramWriter - WARNING - Attempt 3 failed tests. Feedback for next attempt:
+Code executed but failed/errored on 1 test(s):
+- Input: {'n': -1}, Expected: Invalid input, Got: None
+2025-04-08 18:02:29 - AIProgramWriter - ERROR - Code generation failed to produce passing code after 3 attempts.
+2025-04-08 18:02:29 - AIProgramWriter - ERROR - Generation failed: Failed to generate code that passes all provided tests after multiple retries.
 Traceback (most recent call last):
-  File "C:\Users\Anton\Projects\ProgramLabbet\MCP_Server\mcp_function_generator\ai_program_writer.py", line 260, in generate_and_validate
-    code, test_run_results = await self._generate_and_test_code_with_retries(spec, test_cases)
-                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\Anton\Projects\ProgramLabbet\MCP_Server\mcp_function_generator\ai_program_writer.py", line 667, in _generate_and_test_code_with_retries
+  File "C:\Users\Anton\Projects\ProgramLabbet\MCP_Server\mcp_function_generator\ai_program_writer.py", line 253, in generate_and_optionally_test
+    code, test_run_results = await self._generate_and_validate_or_test_code(spec, parsed_test_cases)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Anton\Projects\ProgramLabbet\MCP_Server\mcp_function_generator\ai_program_writer.py", line 624, in _generate_and_validate_or_test_code
     raise CodeGenerationError(
     ...<4 lines>...
     )
-mcp_function_generator.ai_program_writer.CodeGenerationError: Failed to generate code that passes all tests after multiple retries.
-2025-04-08 15:49:59 - AIProgramWriter - INFO - Generation process finished in 48429.25 ms. Success: False
-2025-04-08 15:49:59 - AIProgramWriter - ERROR - AI writer failed. Formatting error response. Errors: ['Failed to generate code that passes all tests after multiple retries.']
+mcp_function_generator.ai_program_writer.CodeGenerationError: Failed to generate code that passes all provided tests after multiple retries.
+2025-04-08 18:02:29 - AIProgramWriter - INFO - Generation process finished in 118163.79 ms. Success: False
+2025-04-08 18:02:29 - AIProgramWriter - ERROR - AI writer failed. Errors: ['Failed to generate code that passes all provided tests after multiple retries.']
+2025-04-08 18:02:32 - AIProgramWriter - INFO - Received request for tool 'create_python_function'. Tests provided: True
+2025-04-08 18:02:32 - AIProgramWriter - INFO - Starting generation for requirement: 'Create a function called 'multiply_numbers' that takes two numbers as input parameters (a and b) and...'. Human tests provided: True
+2025-04-08 18:02:32 - AIProgramWriter - INFO - Processing 3 human-provided test cases to extract input keys...
+2025-04-08 18:02:32 - AIProgramWriter - INFO - Using input keys from tests for spec generation: {'a', 'b'}
+2025-04-08 18:02:32 - AIProgramWriter - INFO - Attempting to generate function specification. Key constraint: {'a', 'b'}
+2025-04-08 18:02:32 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:02:32 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:02:32 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:02:51 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=193
+2025-04-08 18:02:51 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=192
+2025-04-08 18:02:51 - AIProgramWriter - DEBUG - Attempting JSON extraction...
+2025-04-08 18:02:51 - AIProgramWriter - DEBUG - Attempting direct JSON parsing.
+2025-04-08 18:02:51 - AIProgramWriter - INFO - Specification generated: FunctionSpec(name='multiply_numbers', parameters={'a': 'int', 'b': 'int'}, docstring='Multiplies two numbers and returns their product.', returns='int')
+2025-04-08 18:02:51 - AIProgramWriter - INFO - Spec parameter keys successfully validated against test input keys.
+2025-04-08 18:02:51 - AIProgramWriter - INFO - Successfully structured 3 test cases.
+2025-04-08 18:02:51 - AIProgramWriter - INFO - Starting code generation. Testing enabled: True. Max attempts: 3
+2025-04-08 18:02:51 - AIProgramWriter - INFO - Attempting code generation (Attempt 1)...
+2025-04-08 18:02:51 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:02:51 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:02:51 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=76
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=75
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Code generation attempt 1 raw code:
+def multiply_numbers(a: int, b: int) -> int:
+    return a * b
+2025-04-08 18:02:59 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec() in a thread.
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Validating syntax for code:
+---
+def multiply_numbers(a: int, b: int) -> int:
+    return a * b
+---
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error in thread).
+2025-04-08 18:02:59 - AIProgramWriter - INFO - Code syntax and function 'multiply_numbers' presence validated.
+2025-04-08 18:02:59 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec() in threads.
+2025-04-08 18:02:59 - AIProgramWriter - INFO - Running 3 provided tests against generated code...
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Running test 1: Input Dict={'a': 2, 'b': 3}, Expected=6
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Test 1 passed.
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Running test 2: Input Dict={'a': -1, 'b': 5}, Expected=-5
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Test 2 passed.
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Running test 3: Input Dict={'a': 0, 'b': 100}, Expected=0
+2025-04-08 18:02:59 - AIProgramWriter - DEBUG - Test 3 passed.
+2025-04-08 18:02:59 - AIProgramWriter - INFO - Tests completed: 3 passed, 0 failed, 0 errors.
+2025-04-08 18:02:59 - AIProgramWriter - INFO - Code passed all 3 provided tests on attempt 1.
+2025-04-08 18:02:59 - AIProgramWriter - INFO - Code generation successful.
+2025-04-08 18:02:59 - AIProgramWriter - INFO - Code passed provided human tests.
+2025-04-08 18:02:59 - AIProgramWriter - INFO - Generation process finished in 26649.27 ms. Success: True
+2025-04-08 18:02:59 - AIProgramWriter - INFO - AI writer succeeded.
+2025-04-08 18:23:28 - AIProgramWriter - INFO - AIProgramWriter initialized with settings: {'debug_logging': True, 'spec_model': 'deepseek-coder:6.7b', 'code_model': 'deepseek-coder:6.7b', 'spec_retries': 3, 'code_retries': 3, 'code_syntax_retries': 1, 'spec_temperature': 0.0, 'code_temperature': 0.1, 'default_seed': 42}
+2025-04-08 18:24:14 - AIProgramWriter - INFO - Received request for tool 'create_python_function'. Tests provided: False
+2025-04-08 18:24:14 - AIProgramWriter - INFO - Starting generation for requirement: 'Create a function called 'factorial' that calculates the factorial of a non-negative integer. The fa...'. Human tests provided: False
+2025-04-08 18:24:14 - AIProgramWriter - INFO - Attempting to generate function specification. Key constraint: None
+2025-04-08 18:24:14 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:24:14 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:24:14 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:24:43 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=178
+2025-04-08 18:24:43 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=177
+2025-04-08 18:24:43 - AIProgramWriter - DEBUG - Attempting JSON extraction...
+2025-04-08 18:24:43 - AIProgramWriter - DEBUG - Attempting direct JSON parsing.
+2025-04-08 18:24:43 - AIProgramWriter - INFO - Specification generated: FunctionSpec(name='factorial', parameters={'n': 'int'}, docstring='Calculates the factorial of a non-negative integer.', returns='Optional[int]')
+2025-04-08 18:24:43 - AIProgramWriter - INFO - No human tests provided, testing will be skipped.
+2025-04-08 18:24:43 - AIProgramWriter - INFO - Starting code generation. Testing enabled: False. Max attempts: 1
+2025-04-08 18:24:43 - AIProgramWriter - INFO - Attempting code generation (Attempt 1)...
+2025-04-08 18:24:43 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:24:43 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:24:43 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:25:09 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=381
+2025-04-08 18:25:09 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=380
+2025-04-08 18:25:09 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 18:25:09 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 18:25:09 - AIProgramWriter - DEBUG - Code generation attempt 1 raw code:
+from typing import Optional
+import math
+
+def factorial(n: int) -> Optional[int]:
+    if not isinstance(n, int):
+        raise TypeError("Input must be an integer.")
+    elif n < 0:
+        return None  # Return None for negative inputs as per the problem statement.
+    else:
+        fact = 1
+        for i in range(1, n+1):
+            fact *= i
+        return fact
+2025-04-08 18:25:09 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec() in a thread.
+2025-04-08 18:25:09 - AIProgramWriter - DEBUG - Validating syntax for code:
+---
+from typing import Optional
+import math
+
+def factorial(n: int) -> Optional[int]:
+    if not isinstance(n, int):
+        raise TypeError("Input must be an integer.")
+    elif n < 0:
+        return None  # Return None for negative inputs as per the problem statement.
+    else:
+        fact = 1
+        for i in range(1, n+1):
+            fact *= i
+        return fact
+---
+2025-04-08 18:25:09 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error in thread).
+2025-04-08 18:25:09 - AIProgramWriter - INFO - Code syntax and function 'factorial' presence validated.
+2025-04-08 18:25:09 - AIProgramWriter - INFO - Code generated and syntax validated (no tests provided). Attempt 1.
+2025-04-08 18:25:09 - AIProgramWriter - INFO - Code generation successful.
+2025-04-08 18:25:09 - AIProgramWriter - INFO - Testing skipped or not provided.
+2025-04-08 18:25:09 - AIProgramWriter - INFO - Generation process finished in 55017.57 ms. Success: True
+2025-04-08 18:25:09 - AIProgramWriter - INFO - AI writer succeeded.
+2025-04-08 18:25:15 - AIProgramWriter - INFO - Received request for tool 'create_python_function'. Tests provided: True
+2025-04-08 18:25:15 - AIProgramWriter - INFO - Starting generation for requirement: 'Create a function called 'is_palindrome' that checks if a given string is a palindrome. A palindrome...'. Human tests provided: True
+2025-04-08 18:25:15 - AIProgramWriter - INFO - Processing 4 human-provided test cases to extract input keys...
+2025-04-08 18:25:15 - AIProgramWriter - INFO - Using input keys from tests for spec generation: {'text'}
+2025-04-08 18:25:15 - AIProgramWriter - INFO - Attempting to generate function specification. Key constraint: {'text'}
+2025-04-08 18:25:15 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:25:15 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:25:15 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:25:36 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=166
+2025-04-08 18:25:36 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=165
+2025-04-08 18:25:36 - AIProgramWriter - DEBUG - Attempting JSON extraction...
+2025-04-08 18:25:36 - AIProgramWriter - DEBUG - Attempting direct JSON parsing.
+2025-04-08 18:25:36 - AIProgramWriter - INFO - Specification generated: FunctionSpec(name='is_palindrome', parameters={'text': 'str'}, docstring='Checks if a given string is a palindrome.', returns='bool')
+2025-04-08 18:25:36 - AIProgramWriter - INFO - Spec parameter keys successfully validated against test input keys.
+2025-04-08 18:25:36 - AIProgramWriter - INFO - Successfully structured 4 test cases.
+2025-04-08 18:25:36 - AIProgramWriter - INFO - Starting code generation. Testing enabled: True. Max attempts: 3
+2025-04-08 18:25:36 - AIProgramWriter - INFO - Attempting code generation (Attempt 1)...
+2025-04-08 18:25:36 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:25:36 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:25:36 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=337
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=336
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Code generation attempt 1 raw code:
+def is_palindrome(text):
+    # Checking for type mismatch
+    if not isinstance(text, str):
+        raise TypeError("Input must be of 'str' type")
+    
+    # Removing spaces and converting to lower case
+    text = text.replace(' ', '').lower()
+    
+    # Comparing the string with its reverse
+    return text == text[::-1]
+2025-04-08 18:26:00 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec() in a thread.
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Validating syntax for code:
+---
+def is_palindrome(text):
+    # Checking for type mismatch
+    if not isinstance(text, str):
+        raise TypeError("Input must be of 'str' type")
+    
+    # Removing spaces and converting to lower case
+    text = text.replace(' ', '').lower()
+    
+    # Comparing the string with its reverse
+    return text == text[::-1]
+---
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error in thread).
+2025-04-08 18:26:00 - AIProgramWriter - INFO - Code syntax and function 'is_palindrome' presence validated.
+2025-04-08 18:26:00 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec() in threads.
+2025-04-08 18:26:00 - AIProgramWriter - INFO - Running 4 provided tests against generated code...
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Running test 1: Input Dict={'text': 'A man, a plan, a canal: Panama'}, Expected=True
+2025-04-08 18:26:00 - AIProgramWriter - WARNING - Test 1 failed: Expected=True, Actual=False
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Running test 2: Input Dict={'text': 'race a car'}, Expected=False
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Test 2 passed.
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Running test 3: Input Dict={'text': 'Was it a car or a cat I saw?'}, Expected=True
+2025-04-08 18:26:00 - AIProgramWriter - WARNING - Test 3 failed: Expected=True, Actual=False
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Running test 4: Input Dict={'text': ''}, Expected=True
+2025-04-08 18:26:00 - AIProgramWriter - DEBUG - Test 4 passed.
+2025-04-08 18:26:00 - AIProgramWriter - INFO - Tests completed: 2 passed, 2 failed, 0 errors.
+2025-04-08 18:26:00 - AIProgramWriter - WARNING - Attempt 1 failed tests. Feedback for next attempt:
+Code executed but failed/errored on 2 test(s):
+- Input: {'text': 'A man, a plan, a canal: Panama'}, Expected: True, Got: False
+- Input: {'text': 'Was it a car or a cat I saw?'}, Expected: True, Got: False
+2025-04-08 18:26:00 - AIProgramWriter - WARNING - Retrying code generation (Attempt 2/3) with test feedback.
+2025-04-08 18:26:02 - AIProgramWriter - INFO - Attempting code generation (Attempt 2)...
+2025-04-08 18:26:02 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Offloading generation for model deepseek-coder:6.7b to thread.
+2025-04-08 18:26:02 - AIProgramWriter - DEBUG - SYNC OLLAMA: Starting generation for model deepseek-coder:6.7b
+2025-04-08 18:26:02 - AIProgramWriter - DEBUG - SYNC OLLAMA: Stream object obtained for deepseek-coder:6.7b
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - SYNC OLLAMA: Finished accumulating response for deepseek-coder:6.7b. Length=246
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - ASYNC OLLAMA: Received final response from thread for deepseek-coder:6.7b. Length=245
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Code generation attempt 2 raw code:
+import re
+
+def is_palindrome(text):
+    text = text.lower() # convert to lowercase
+    text = re.sub('[^a-z]', '', text)  # remove non-alphabetic characters
+    
+    return text == text[::-1]   # compare the string with its reverse
+2025-04-08 18:26:22 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec() in a thread.
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Validating syntax for code:
+---
+import re
+
+def is_palindrome(text):
+    text = text.lower() # convert to lowercase
+    text = re.sub('[^a-z]', '', text)  # remove non-alphabetic characters
+    
+    return text == text[::-1]   # compare the string with its reverse
+---
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error in thread).
+2025-04-08 18:26:22 - AIProgramWriter - INFO - Code syntax and function 'is_palindrome' presence validated.
+2025-04-08 18:26:22 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec() in threads.
+2025-04-08 18:26:22 - AIProgramWriter - INFO - Running 4 provided tests against generated code...
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Running test 1: Input Dict={'text': 'A man, a plan, a canal: Panama'}, Expected=True
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Test 1 passed.
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Running test 2: Input Dict={'text': 'race a car'}, Expected=False
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Test 2 passed.
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Running test 3: Input Dict={'text': 'Was it a car or a cat I saw?'}, Expected=True
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Test 3 passed.
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Running test 4: Input Dict={'text': ''}, Expected=True
+2025-04-08 18:26:22 - AIProgramWriter - DEBUG - Test 4 passed.
+2025-04-08 18:26:22 - AIProgramWriter - INFO - Tests completed: 4 passed, 0 failed, 0 errors.
+2025-04-08 18:26:22 - AIProgramWriter - INFO - Code passed all 4 provided tests on attempt 2.
+2025-04-08 18:26:22 - AIProgramWriter - INFO - Code generation successful.
+2025-04-08 18:26:22 - AIProgramWriter - INFO - Code passed provided human tests.
+2025-04-08 18:26:22 - AIProgramWriter - INFO - Generation process finished in 67258.01 ms. Success: True
+2025-04-08 18:26:22 - AIProgramWriter - INFO - AI writer succeeded.
