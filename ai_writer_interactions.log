@@ -1,0 +1,266 @@
+2025-04-08 15:49:11 - AIProgramWriter - INFO - AIProgramWriter initialized with settings: {'debug_logging': True, 'spec_model': 'deepseek-coder:6.7b', 'code_model': 'deepseek-coder:6.7b', 'test_model': 'deepseek-coder:6.7b', 'spec_retries': 3, 'code_retries': 3, 'test_retries': 3, 'spec_temperature': 0.0, 'code_temperature': 0.1, 'test_temperature': 0.1, 'default_seed': 42}
+2025-04-08 15:49:11 - AIProgramWriter - INFO - Received request for tool 'create_python_function' with requirement: Takes an integer 'count' and a string 'text'. Checks if the integer 'count' is greater than the leng...
+2025-04-08 15:49:11 - AIProgramWriter - INFO - Starting generation for requirement: 'Takes an integer 'count' and a string 'text'. Checks if the integer 'count' is greater than the leng...'
+2025-04-08 15:49:11 - AIProgramWriter - INFO - Attempting to generate function specification...
+2025-04-08 15:49:11 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.0, 'seed': 42, 'top_k': 1}
+--- Prompt ---
+SYSTEM: You are a precise code specification generator. Respond ONLY with valid JSON fitting the template. No explanations, apologies, or introductory text. Ensure types are valid Python type hints. The docstring should concisely describe the function's core purpose.
+REQUIREMENT:
+Takes an integer 'count' and a string 'text'. Checks if the integer 'count' is greater than the length of the string 'text'. Returns a boolean.
+
+JSON TEMPLATE:
+{
+    "name": "function_name",
+    "parameters": { // Mapping of parameter name to Python type hint string (e.g., "s": "str", "nums": "list[int]")
+        "param_name_1": "type_hint_1",
+        "param_name_2": "type_hint_2"
+    },
+    "docstring": "Concise description (under 20 words) of what the function does.",
+    "returns": "Python type hint string for the return value (e.g., 'str', 'bool', 'Optional[int]')"
+}
+
+RULES:
+1. Output *only* the JSON object.
+2. Parameter and return types must be valid Python type hints (e.g., `str`, `int`, `list[int]`, `dict[str, float]`, `Optional[bool]`).
+3. The docstring must accurately and concisely reflect the requirement.
+4. Do not use markdown fences like ```json.
+
+VALID JSON RESPONSE:
+-------------
+2025-04-08 15:49:28 - AIProgramWriter - DEBUG - Ollama Raw Response:
+{
+    "name": "check_count",
+    "parameters": {
+        "count": "int",
+        "text": "str"
+    },
+    "docstring": "Checks if count is greater than length of text.",
+    "returns": "bool"
+}
+
+2025-04-08 15:49:28 - AIProgramWriter - DEBUG - Attempting JSON extraction...
+2025-04-08 15:49:28 - AIProgramWriter - DEBUG - Attempting direct JSON parsing.
+2025-04-08 15:49:28 - AIProgramWriter - INFO - Specification generated: FunctionSpec(name='check_count', parameters={'count': 'int', 'text': 'str'}, docstring='Checks if count is greater than length of text.', returns='bool')
+2025-04-08 15:49:28 - AIProgramWriter - INFO - Attempting to generate test cases...
+2025-04-08 15:49:28 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.1, 'seed': 42}
+--- Prompt ---
+SYSTEM: You are a test case generator. Create a diverse set of relevant test cases (including edge cases) for the given Python function specification. Respond ONLY with a valid JSON object containing a list under the "tests" key, following the exact format provided. Do not include explanations, apologies, or text outside the JSON structure.
+
+FUNCTION SPECIFICATION:
+Name: check_count
+Parameters: {'count': 'int', 'text': 'str'}
+Return Type: bool
+Description: Checks if count is greater than length of text.
+
+JSON TEMPLATE:
+{
+    "tests": [
+        { "inputs": { "param_name_1": <value_1>, "param_name_2": <value_2> }, "expected": <expected_return_value> },
+        // ... more test cases ...
+    ]
+}
+
+RULES:
+1. Provide at least 3 diverse test cases (normal, edge, potentially invalid if relevant to error handling).
+2. Ensure input values match the expected types in the parameters (e.g., if "nums": "list[int]", provide `[1, 2, 3]`, not `"1, 2, 3"`).
+3. Ensure the "expected" value matches the specified return type.
+4. Output *only* the JSON object. Do not use markdown fences.
+
+VALID JSON RESPONSE:
+-------------
+2025-04-08 15:49:38 - AIProgramWriter - DEBUG - Ollama Raw Response:
+{
+    "tests": [
+        { "inputs": {"count": 10, "text": "hello"}, "expected": true},
+        { "inputs": {"count": 3, "text": "hi"}, "expected": false},
+        { "inputs": {"count": -5, "text": ""}, "expected": false}
+    ]
+}
+
+2025-04-08 15:49:38 - AIProgramWriter - DEBUG - Attempting JSON extraction...
+2025-04-08 15:49:38 - AIProgramWriter - DEBUG - Attempting direct JSON parsing.
+2025-04-08 15:49:38 - AIProgramWriter - INFO - Successfully parsed 3 test cases.
+2025-04-08 15:49:38 - AIProgramWriter - INFO - Generated 3 test cases.
+2025-04-08 15:49:38 - AIProgramWriter - INFO - Starting code generation and testing loop...
+2025-04-08 15:49:38 - AIProgramWriter - INFO - Attempting code generation (Attempt 1/3)...
+2025-04-08 15:49:38 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.1, 'seed': 42}
+--- Prompt ---
+SYSTEM: You are a Python code generation assistant. Create a Python function based *only* on the provided specification. Include necessary imports if standard libraries are needed (like `math`, `re`, `typing`). Handle potential edge cases and errors gracefully where appropriate (e.g., empty inputs, type mismatches if feasible within the function). Respond ONLY with the complete Python code for the function definition, including imports if needed. Do NOT include example usage, explanations outside comments, or markdown fences.
+
+SPECIFICATION:
+Function Name: check_count
+Parameters: {'count': 'int', 'text': 'str'}
+Return Type: bool
+Description: Checks if count is greater than length of text.
+
+PYTHON CODE ONLY:
+-------------
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Ollama Raw Response:
+```python
+def check_count(count: int, text: str) -> bool:
+    return count > len(text)
+```
+
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Code generation attempt 1 result:
+def check_count(count: int, text: str) -> bool:
+    return count > len(text)
+2025-04-08 15:49:42 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec().
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Validating syntax for code:
+---
+def check_count(count: int, text: str) -> bool:
+    return count > len(text)
+---
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error).
+2025-04-08 15:49:42 - AIProgramWriter - INFO - Code syntax and function 'check_count' presence validated.
+2025-04-08 15:49:42 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec().
+2025-04-08 15:49:42 - AIProgramWriter - INFO - Running 3 tests against generated code...
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Running test 1: Input={'count': 10, 'text': 'hello'}, Expected=True
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Test 1 passed.
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Running test 2: Input={'count': 3, 'text': 'hi'}, Expected=False
+2025-04-08 15:49:42 - AIProgramWriter - WARNING - Test 2 failed: Expected=False, Actual=True
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Running test 3: Input={'count': -5, 'text': ''}, Expected=False
+2025-04-08 15:49:42 - AIProgramWriter - DEBUG - Test 3 passed.
+2025-04-08 15:49:42 - AIProgramWriter - INFO - Tests completed: 2 passed, 1 failed, 0 errors.
+2025-04-08 15:49:42 - AIProgramWriter - WARNING - Attempt 1 failed tests. Feedback for next attempt: Code executed but failed 1 test(s):
+- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
+2025-04-08 15:49:42 - AIProgramWriter - WARNING - Retrying code generation (Attempt 2/3) with feedback.
+2025-04-08 15:49:44 - AIProgramWriter - INFO - Attempting code generation (Attempt 2/3)...
+2025-04-08 15:49:44 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.1, 'seed': 43}
+--- Prompt ---
+SYSTEM: You are a Python code generation assistant. Create a Python function based *only* on the provided specification. Include necessary imports if standard libraries are needed (like `math`, `re`, `typing`). Handle potential edge cases and errors gracefully where appropriate (e.g., empty inputs, type mismatches if feasible within the function). Respond ONLY with the complete Python code for the function definition, including imports if needed. Do NOT include example usage, explanations outside comments, or markdown fences.
+
+SPECIFICATION:
+Function Name: check_count
+Parameters: {'count': 'int', 'text': 'str'}
+Return Type: bool
+Description: Checks if count is greater than length of text.
+
+PREVIOUS ERROR (Attempt 2):
+Code executed but failed 1 test(s):
+- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
+
+PYTHON CODE ONLY:
+-------------
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Ollama Raw Response:
+```python
+def check_count(count: int, text: str) -> bool:
+    if not isinstance(count, int):
+        raise TypeError("Count must be an integer")
+    elif not isinstance(text, str):
+        raise TypeError("Text must be a string")
+    
+    return count > len(text)
+```
+
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Code generation attempt 2 result:
+def check_count(count: int, text: str) -> bool:
+    if not isinstance(count, int):
+        raise TypeError("Count must be an integer")
+    elif not isinstance(text, str):
+        raise TypeError("Text must be a string")
+    
+    return count > len(text)
+2025-04-08 15:49:49 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec().
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Validating syntax for code:
+---
+def check_count(count: int, text: str) -> bool:
+    if not isinstance(count, int):
+        raise TypeError("Count must be an integer")
+    elif not isinstance(text, str):
+        raise TypeError("Text must be a string")
+    
+    return count > len(text)
+---
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error).
+2025-04-08 15:49:49 - AIProgramWriter - INFO - Code syntax and function 'check_count' presence validated.
+2025-04-08 15:49:49 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec().
+2025-04-08 15:49:49 - AIProgramWriter - INFO - Running 3 tests against generated code...
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Running test 1: Input={'count': 10, 'text': 'hello'}, Expected=True
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Test 1 passed.
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Running test 2: Input={'count': 3, 'text': 'hi'}, Expected=False
+2025-04-08 15:49:49 - AIProgramWriter - WARNING - Test 2 failed: Expected=False, Actual=True
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Running test 3: Input={'count': -5, 'text': ''}, Expected=False
+2025-04-08 15:49:49 - AIProgramWriter - DEBUG - Test 3 passed.
+2025-04-08 15:49:49 - AIProgramWriter - INFO - Tests completed: 2 passed, 1 failed, 0 errors.
+2025-04-08 15:49:49 - AIProgramWriter - WARNING - Attempt 2 failed tests. Feedback for next attempt: Code executed but failed 1 test(s):
+- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
+2025-04-08 15:49:49 - AIProgramWriter - WARNING - Retrying code generation (Attempt 3/3) with feedback.
+2025-04-08 15:49:53 - AIProgramWriter - INFO - Attempting code generation (Attempt 3/3)...
+2025-04-08 15:49:53 - AIProgramWriter - DEBUG - Ollama Request: Model=deepseek-coder:6.7b, Options={'temperature': 0.1, 'seed': 44}
+--- Prompt ---
+SYSTEM: You are a Python code generation assistant. Create a Python function based *only* on the provided specification. Include necessary imports if standard libraries are needed (like `math`, `re`, `typing`). Handle potential edge cases and errors gracefully where appropriate (e.g., empty inputs, type mismatches if feasible within the function). Respond ONLY with the complete Python code for the function definition, including imports if needed. Do NOT include example usage, explanations outside comments, or markdown fences.
+
+SPECIFICATION:
+Function Name: check_count
+Parameters: {'count': 'int', 'text': 'str'}
+Return Type: bool
+Description: Checks if count is greater than length of text.
+
+PREVIOUS ERROR (Attempt 3):
+Code executed but failed 1 test(s):
+- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
+
+PYTHON CODE ONLY:
+-------------
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Ollama Raw Response:
+```python
+def check_count(count: int, text: str) -> bool:
+    if not isinstance(count, int):
+        raise TypeError("Count must be an integer.")
+    elif not isinstance(text, str):
+        raise TypeError("Text must be a string.")
+    
+    return count > len(text)
+```
+
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Attempting Python code extraction...
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Extracted code from ```python block.
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Code generation attempt 3 result:
+def check_count(count: int, text: str) -> bool:
+    if not isinstance(count, int):
+        raise TypeError("Count must be an integer.")
+    elif not isinstance(text, str):
+        raise TypeError("Text must be a string.")
+    
+    return count > len(text)
+2025-04-08 15:49:59 - AIProgramWriter - WARNING - Executing _validate_code_syntax_and_signature which uses potentially unsafe exec().
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Validating syntax for code:
+---
+def check_count(count: int, text: str) -> bool:
+    if not isinstance(count, int):
+        raise TypeError("Count must be an integer.")
+    elif not isinstance(text, str):
+        raise TypeError("Text must be a string.")
+    
+    return count > len(text)
+---
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Code syntax validation passed (exec completed without error).
+2025-04-08 15:49:59 - AIProgramWriter - INFO - Code syntax and function 'check_count' presence validated.
+2025-04-08 15:49:59 - AIProgramWriter - WARNING - Executing _run_tests which uses potentially unsafe exec().
+2025-04-08 15:49:59 - AIProgramWriter - INFO - Running 3 tests against generated code...
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Running test 1: Input={'count': 10, 'text': 'hello'}, Expected=True
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Test 1 passed.
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Running test 2: Input={'count': 3, 'text': 'hi'}, Expected=False
+2025-04-08 15:49:59 - AIProgramWriter - WARNING - Test 2 failed: Expected=False, Actual=True
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Running test 3: Input={'count': -5, 'text': ''}, Expected=False
+2025-04-08 15:49:59 - AIProgramWriter - DEBUG - Test 3 passed.
+2025-04-08 15:49:59 - AIProgramWriter - INFO - Tests completed: 2 passed, 1 failed, 0 errors.
+2025-04-08 15:49:59 - AIProgramWriter - WARNING - Attempt 3 failed tests. Feedback for next attempt: Code executed but failed 1 test(s):
+- Input: {'count': 3, 'text': 'hi'}, Expected: False, Got: True
+2025-04-08 15:49:59 - AIProgramWriter - ERROR - Code generation failed to produce passing code after 3 attempts.
+2025-04-08 15:49:59 - AIProgramWriter - ERROR - Generation failed: Failed to generate code that passes all tests after multiple retries.
+Traceback (most recent call last):
+  File "C:\Users\Anton\Projects\ProgramLabbet\MCP_Server\mcp_function_generator\ai_program_writer.py", line 260, in generate_and_validate
+    code, test_run_results = await self._generate_and_test_code_with_retries(spec, test_cases)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Anton\Projects\ProgramLabbet\MCP_Server\mcp_function_generator\ai_program_writer.py", line 667, in _generate_and_test_code_with_retries
+    raise CodeGenerationError(
+    ...<4 lines>...
+    )
+mcp_function_generator.ai_program_writer.CodeGenerationError: Failed to generate code that passes all tests after multiple retries.
+2025-04-08 15:49:59 - AIProgramWriter - INFO - Generation process finished in 48429.25 ms. Success: False
+2025-04-08 15:49:59 - AIProgramWriter - ERROR - AI writer failed. Formatting error response. Errors: ['Failed to generate code that passes all tests after multiple retries.']

@@ -1,0 +1,56 @@
+[project]
+name = "mcp-function-generator"
+version = "0.1.0"
+description = "An MCP server exposing a Python function generation tool"
+readme = "README.md"
+requires-python = ">=3.10"
+# --- Replace with your author information ---
+authors = [
+    { name = "Anton Lundgren"},
+]
+maintainers = [
+     { name = "Anton Lundgren"},
+]
+keywords = ["mcp", "llm", "automation", "python", "code-generation"]
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 4 - Beta", # Adjust as your project matures
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License", # Change if you choose a different license
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11", # Add versions you support
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = ["anyio>=4.5", "click>=8.1.0", "mcp", "ollama"]
+
+[project.scripts]
+mcp-function-generator = "mcp_function_generator.server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["mcp_function_generator"]
+
+[tool.pyright]
+include = ["mcp_function_generator"]
+venvPath = "."
+venv = ".venv"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"] # Common useful lint rules (Error, Pyflakes, Isort)
+ignore = []
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.uv]
+dev-dependencies = [
+    "pyright>=1.1.378",
+    "pytest>=8.3.3",
+    "ruff>=0.6.9",
+    "uvicorn>=0.29.0", # Explicitly add uvicorn for SSE support
+]
